@@ -1,5 +1,5 @@
 # Local imports
-from gomoku.gui import GomokuWindow
+from gomoku.window import GomokuWindow
 # Module imports
 from PySide6.QtWidgets import QApplication
 import sys
@@ -10,6 +10,7 @@ def main():
 
     # Create and show main window
     window = GomokuWindow()
+    window.setView("menu")
     window.show()
 
     # Start event loop
