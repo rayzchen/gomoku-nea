@@ -31,17 +31,22 @@ class MainMenuView(QWidget):
             button = QPushButton(label)
             self.buttonLayout.addWidget(button)
             button.setFont(BUTTON_FONT)
-            button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+            button.setSizePolicy(
+                QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
             buttons.append(button)
 
         # Create spacers
         for position in [0, 2, 4]:
             # Vertically expanding
-            item = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+            item = QSpacerItem(
+                20, 40,
+                QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
             self.vlayout.insertSpacerItem(position, item)
         for position in [0, 2]:
             # Horizontally expanding
-            item = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+            item = QSpacerItem(
+                20, 40,
+                QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
             self.hlayout.insertSpacerItem(position, item)
 
         # Adjust layout stretches
