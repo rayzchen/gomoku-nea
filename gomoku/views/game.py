@@ -63,3 +63,9 @@ class BoardWidget(QWidget):
                 # Qt coordinate system has (0, 0) at top left
                 pos = QPoint(20 + x*40, 600 - (20 + y*40))
                 painter.drawEllipse(pos, 15, 15)
+
+    def resizeEvent(self, event):
+        # Ensure the dimensions of the widget remain square
+        super(BoardWidget, self).resizeEvent(event)
+        size = min(event.size().width(), event.size().height())
+        self.resize(size, size)
