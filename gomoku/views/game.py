@@ -1,11 +1,12 @@
 # Local imports
 from gomoku.colors import *
+from gomoku.views.abc import InterfaceView
 # Module imports
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
+from PySide6.QtWidgets import QVBoxLayout, QLabel
 from PySide6.QtGui import QPainter, Qt, QBrush
 from PySide6.QtCore import QPoint
 
-class BoardWidget(QWidget):
+class BoardWidget(InterfaceView):
     def __init__(self, board):
         # Set up widget and layout
         super(BoardWidget, self).__init__()
