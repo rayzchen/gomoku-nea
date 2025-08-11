@@ -3,7 +3,7 @@ from gomoku.colors import *
 from gomoku.views.abc import InterfaceView
 # Module imports
 from PySide6.QtWidgets import QVBoxLayout, QLabel
-from PySide6.QtGui import QPainter, Qt, QBrush
+from PySide6.QtGui import QPainter, Qt, QBrush, QColor
 from PySide6.QtCore import QPoint
 
 class BoardWidget(InterfaceView):
@@ -21,6 +21,13 @@ class BoardWidget(InterfaceView):
         # Store reference to board state
         self.board = board
 
+        # Store location that mouse pointer points to
+        # None if pointer is not in board
+        self.cursorCell = None
+        # Make sure this widget can access pointer location
+        self.label.setMouseTracking(True)
+        self.setMouseTracking(True)
+
     def reset(self):
         pass
 
@@ -31,6 +38,10 @@ class BoardWidget(InterfaceView):
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         painter.setWindow(0, 0, 600, 600)
 
+        self.drawBoard(painter)
+        self.drawCursor(painter)
+
+    def drawBoard(self, painter):
         # Draw background
         painter.fillRect(0, 0, 600, 600, BACKGROUND_COLOR)
 
@@ -65,8 +76,36 @@ class BoardWidget(InterfaceView):
                 pos = QPoint(20 + x*40, 600 - (20 + y*40))
                 painter.drawEllipse(pos, 15, 15)
 
+    def drawCursor(self, painter):
+        # Draw cursor piece (if possible)
+        if self.cursorCell is not None:
+            x, y = self.cursorCell
+            if self.board.positionEmpty(x, y):
+                if self.board.currentPlayer == 1:
+                    color = QColor(BLACK_PIECE_COLOR)
+                else:
+                    color = QColor(WHITE_PIECE_COLOR)
+                color.setAlpha(128)
+
+                painter.setBrush(QBrush(color))
+                pos = QPoint(20 + x*40, 600 - (20 + y*40))
+                painter.drawEllipse(pos, 15, 15)
+
     def resizeEvent(self, event):
         # Ensure the dimensions of the widget remain square
         super(BoardWidget, self).resizeEvent(event)
         size = min(event.size().width(), event.size().height())
         self.resize(size, size)
+
+    def mouseMoveEvent(self, event):
+        # Store the position of the cell that the mouse is hovering over
+        super(BoardWidget, self).mouseMoveEvent(event)
+        pos = event.position()
+        cellSize = self.width() / 15
+        self.cursorCell = (int(pos.x() / cellSize), int(15 - pos.y() / cellSize))
+        self.update()
+
+    def leaveEvent(self, event):
+        # Reset the hovered cell
+        super(BoardWidget, self).leaveEvent(event)
+        self.cursorCell = None
