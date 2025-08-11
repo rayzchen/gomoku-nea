@@ -1,8 +1,10 @@
+# Local imports
+from gomoku.views.abc import InterfaceView
 # Module imports
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QSpacerItem, QLabel, QHBoxLayout, QPushButton, QSizePolicy
+from PySide6.QtWidgets import QVBoxLayout, QSpacerItem, QLabel, QHBoxLayout, QPushButton, QSizePolicy
 from PySide6.QtGui import QFont, Qt
 
-class MainMenuView(QWidget):
+class MainMenuView(InterfaceView):
     def __init__(self):
         # Constants for the fonts used in the menu
         TITLE_FONT = QFont("Noto Sans JP", 60)
