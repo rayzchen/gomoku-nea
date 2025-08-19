@@ -16,11 +16,8 @@ class Board:
         return self.getPiece(x, y) == 0
 
     def swapPlayer(self):
-        # Change the current player
-        if self.currentPlayer == 1:
-            self.currentPlayer = 2
-        elif self.currentPlayer == 2:
-            self.currentPlayer = 1
+        # Change the current player (1 becomes 2, 2 becomes 1)
+        self.currentPlayer = 3 - self.currentPlayer
 
     def playPiece(self, x, y):
         # Attempt to place a piece, return True if successful
@@ -37,10 +34,11 @@ class Board:
         else:
             return False
 
+    @staticmethod
     def checkLine(line):
         # Return early if provided line is too short
         if len(line) < 5:
-            return False
+            return 0
 
         # Check for consecutively equal elements
         current = 0
@@ -59,16 +57,20 @@ class Board:
         return 0
 
     def checkWin(self):
+        # Return early if history is too short
+        if len(self.history) < 9:
+            return 0
+
         # Check rows
         for i in range(15):
-            win = self.checkLine(self.pieces[i])
+            win = Board.checkLine(self.pieces[i])
             if win != 0:
                 return win
 
         # Check columns
         for i in range(15):
             column = [self.pieces[j][i] for j in range(15)]
-            win = self.checkLine(column)
+            win = Board.checkLine(column)
             if win != 0:
                 return win
 
@@ -81,7 +83,7 @@ class Board:
                 diagonal.append(self.pieces[y][x])
                 x += 1
                 y += 1
-            win = self.checkLine(diagonal)
+            win = Board.checkLine(diagonal)
             if win != 0:
                 return win
 
@@ -93,7 +95,7 @@ class Board:
                 diagonal.append(self.pieces[y][x])
                 x += 1
                 y += 1
-            win = self.checkLine(diagonal)
+            win = Board.checkLine(diagonal)
             if win != 0:
                 return win
 
@@ -106,7 +108,7 @@ class Board:
                 diagonal.append(self.pieces[y][x])
                 x += 1
                 y -= 1
-            win = self.checkLine(diagonal)
+            win = Board.checkLine(diagonal)
             if win != 0:
                 return win
 
@@ -118,10 +120,17 @@ class Board:
                 diagonal.append(self.pieces[y][x])
                 x += 1
                 y -= 1
-            win = self.checkLine(diagonal)
+            win = Board.checkLine(diagonal)
             if win != 0:
                 return win
 
+        if self.checkDraw():
+            return -1
+
+        # No result, game has not ended
+        return 0
+
+    def checkDraw(self):
         # Check draw
         full = True
         for y in range(15):
@@ -131,8 +140,96 @@ class Board:
                     break
             if not full:
                 break
-        if full:
-            # Pieces found, return tie
+        return full
+
+    def checkWinPiece(self):
+        # Return early if history is too short
+        if len(self.history) < 9:
+            return 0
+
+        lastX, lastY = self.history[-1]
+
+        # Horizontal
+        start = max(0, lastX - 4)
+        end = min(14, lastX + 4)
+        line = [self.getPiece(i, lastY) for i in range(start, end + 1)]
+        win = self.checkLine(line)
+        if win != 0:
+            return win
+
+        # Vertical
+        start = max(0, lastY - 4)
+        end = min(14, lastY + 4)
+        line = [self.getPiece(lastX, i) for i in range(start, end + 1)]
+        win = self.checkLine(line)
+        if win != 0:
+            return win
+
+        # Main diagonal
+        startX = endX = lastX
+        startY = endY = lastY
+        while True:
+            if lastX - startX == 4:
+                # Travelled 4 pieces
+                return
+            if startX == 0 or startY == 0:
+                # Reached edge
+                break
+            # Move down diagonal
+            startX -= 1
+            startY -= 1
+        while True:
+            if endX - lastX == 4:
+                # Travelled 4 pieces
+                return
+            if endX == 14 or endY == 14:
+                # Reached edge
+                break
+            # Move up diagonal
+            endX += 1
+            endY += 1
+
+        rangeX = range(startX, endX + 1)
+        rangeY = range(startY, endY + 1)
+        # Combine ranges
+        line = [self.getPiece(x, y) for x, y in zip(rangeX, rangeY)]
+        win = self.checkLine(line)
+        if win != 0:
+            return win
+
+        # Counter diagonal
+        startX = endX = lastX
+        startY = endY = lastY
+        while True:
+            if lastX - startX == 4:
+                # Travelled 4 pieces
+                return
+            if startX == 0 or startY == 14:
+                # Reached edge
+                break
+            # Move down diagonal
+            startX -= 1
+            startY += 1
+        while True:
+            if endX - lastX == 4:
+                # Travelled 4 pieces
+                return
+            if endX == 14 or endY == 0:
+                # Reached edge
+                break
+            # Move up diagonal
+            endX += 1
+            endY -= 1
+
+        rangeX = range(startX, endX + 1)
+        rangeY = range(startY, endY + 1)
+        # Combine ranges
+        line = [self.getPiece(x, y) for x, y in zip(rangeX, rangeY)]
+        win = self.checkLine(line)
+        if win != 0:
+            return win
+
+        if self.checkDraw():
             return -1
 
         # No result, game has not ended
