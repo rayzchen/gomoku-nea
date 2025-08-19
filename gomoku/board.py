@@ -29,6 +29,7 @@ class Board:
 
         if self.positionEmpty(x, y):
             self.pieces[y][x] = self.currentPlayer
+            self.history.append((x, y))
             self.swapPlayer()
             return True
         else:
@@ -171,7 +172,7 @@ class Board:
         while True:
             if lastX - startX == 4:
                 # Travelled 4 pieces
-                return
+                break
             if startX == 0 or startY == 0:
                 # Reached edge
                 break
@@ -181,7 +182,7 @@ class Board:
         while True:
             if endX - lastX == 4:
                 # Travelled 4 pieces
-                return
+                break
             if endX == 14 or endY == 14:
                 # Reached edge
                 break
@@ -203,7 +204,7 @@ class Board:
         while True:
             if lastX - startX == 4:
                 # Travelled 4 pieces
-                return
+                break
             if startX == 0 or startY == 14:
                 # Reached edge
                 break
@@ -213,7 +214,7 @@ class Board:
         while True:
             if endX - lastX == 4:
                 # Travelled 4 pieces
-                return
+                break
             if endX == 14 or endY == 0:
                 # Reached edge
                 break
@@ -222,7 +223,7 @@ class Board:
             endY -= 1
 
         rangeX = range(startX, endX + 1)
-        rangeY = range(startY, endY + 1)
+        rangeY = range(startY, endY - 1, -1)
         # Combine ranges
         line = [self.getPiece(x, y) for x, y in zip(rangeX, rangeY)]
         win = self.checkLine(line)
