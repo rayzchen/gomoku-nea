@@ -102,10 +102,11 @@ class BoardWidget(InterfaceView):
         super(BoardWidget, self).mouseMoveEvent(event)
         pos = event.position()
         cellSize = self.width() / 15
-        self.cursorCell = (int(pos.x() / cellSize), int(15 - pos.y() / cellSize))
+        self.cursorCell = (int(pos.x() / cellSize), 14 - int(pos.y() / cellSize))
         self.update()
 
     def leaveEvent(self, event):
         # Reset the hovered cell
         super(BoardWidget, self).leaveEvent(event)
         self.cursorCell = None
+        self.update()
