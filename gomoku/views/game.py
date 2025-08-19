@@ -29,8 +29,12 @@ class BoardWidget(InterfaceView):
         self.label.setMouseTracking(True)
         self.setMouseTracking(True)
 
+        # Toggle mouse input
+        self.enableInput = True
+
     def reset(self):
-        pass
+        self.cursorCell = None
+        self.enableInput = True
 
     def paintEvent(self, event):
         # Handle event and create painter object
@@ -40,7 +44,8 @@ class BoardWidget(InterfaceView):
         painter.setWindow(0, 0, 600, 600)
 
         self.drawBoard(painter)
-        self.drawCursor(painter)
+        if self.enableInput:
+            self.drawCursor(painter)
 
     def drawBoard(self, painter):
         # Draw background
@@ -118,3 +123,10 @@ class BoardWidget(InterfaceView):
         super(BoardWidget, self).leaveEvent(event)
         self.cursorCell = None
         self.update()
+
+    def mouseReleaseEvent(self, event):
+        super(BoardWidget, self).mouseReleaseEvent(event)
+        if self.enableInput and event.button() == Qt.MouseButton.LeftButton:
+            if self.board.positionEmpty(*self.cursorCell):
+                self.board.playPiece(*self.cursorCell)
+            self.update()
