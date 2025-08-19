@@ -2,7 +2,7 @@
 from gomoku.colors import *
 from gomoku.views.abc import InterfaceView
 # Module imports
-from PySide6.QtWidgets import QVBoxLayout, QLabel
+from PySide6.QtWidgets import QVBoxLayout, QLabel, QMessageBox
 from PySide6.QtGui import QPainter, Qt, QBrush, QColor
 from PySide6.QtCore import QPoint
 import math
@@ -129,4 +129,29 @@ class BoardWidget(InterfaceView):
         if self.enableInput and event.button() == Qt.MouseButton.LeftButton:
             if self.board.positionEmpty(*self.cursorCell):
                 self.board.playPiece(*self.cursorCell)
+                self.processWin()
             self.update()
+
+    def processWin(self):
+        win = self.board.checkWinPiece()
+        if win == 0:
+            # No result
+            return
+
+        # Create message box
+        box = QMessageBox()
+        box.setWindowTitle("Game result")
+
+        # Select text
+        if win == 1:
+            box.setText("Player 1 has won!")
+        elif win == 2:
+            box.setText("Player 2 has won!")
+        elif win == -1:
+            box.setText("The game is a tie!")
+
+        # Disable further input
+        self.enableInput = False
+        # Show box
+        box.exec()
+
