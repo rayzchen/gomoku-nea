@@ -5,6 +5,7 @@ from gomoku.views.abc import InterfaceView
 from PySide6.QtWidgets import QVBoxLayout, QLabel
 from PySide6.QtGui import QPainter, Qt, QBrush, QColor
 from PySide6.QtCore import QPoint
+import math
 
 class BoardWidget(InterfaceView):
     def __init__(self, board):
@@ -102,10 +103,18 @@ class BoardWidget(InterfaceView):
         super(BoardWidget, self).mouseMoveEvent(event)
         pos = event.position()
         cellSize = self.width() / 15
-        self.cursorCell = (int(pos.x() / cellSize), int(15 - pos.y() / cellSize))
+        self.cursorCell = (
+            math.floor(pos.x() / cellSize),
+            math.floor(15 - pos.y() / cellSize)
+        )
+        if self.cursorCell[0] < 0 or self.cursorCell[0] > 14:
+            self.cursorCell = None
+        elif self.cursorCell[1] < 0 or self.cursorCell[1] > 14:
+            self.cursorCell = None
         self.update()
 
     def leaveEvent(self, event):
         # Reset the hovered cell
         super(BoardWidget, self).leaveEvent(event)
         self.cursorCell = None
+        self.update()
