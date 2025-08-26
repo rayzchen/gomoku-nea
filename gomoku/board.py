@@ -19,6 +19,9 @@ class Board:
         # Change the current player (1 becomes 2, 2 becomes 1)
         self.currentPlayer = 3 - self.currentPlayer
 
+    def getCurrentPlayer(self):
+        return self.currentPlayer
+
     def playPiece(self, x, y):
         # Attempt to place a piece, return True if successful
         # and False otherwise

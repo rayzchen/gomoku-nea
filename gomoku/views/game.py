@@ -86,7 +86,7 @@ class BoardWidget(InterfaceView):
         if self.cursorCell is not None:
             x, y = self.cursorCell
             if self.board.positionEmpty(x, y):
-                if self.board.currentPlayer == 1:
+                if self.board.getCurrentPlayer() == 1:
                     color = QColor(BLACK_PIECE_COLOR)
                 else:
                     color = QColor(WHITE_PIECE_COLOR)
