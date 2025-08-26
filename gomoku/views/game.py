@@ -4,10 +4,15 @@ from gomoku.views.abc import InterfaceView
 # Module imports
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtGui import QPainter, Qt, QBrush, QColor
-from PySide6.QtCore import QPoint
+from PySide6.QtCore import QPoint, QObject, Signal, Slot, QThread, QTimer
 import math
 
 class BoardWidget(InterfaceView):
+    playerPlayed1 = Signal(int, int)
+    playerPlayed2 = Signal(int, int)
+    requestMove1 = Signal()
+    requestMove2 = Signal()
+
     def __init__(self, board):
         # Set up widget
         super(BoardWidget, self).__init__()
@@ -23,6 +28,21 @@ class BoardWidget(InterfaceView):
 
         # Toggle mouse input
         self.enableInput = True
+
+        # Store reference to workers
+        self.workers = {1: None, 2: None}
+        self.gameEnd = False
+
+    def assignWorker(self, worker, number):
+        worker.finished.connect(self.playPiece)
+        self.workers[number] = worker
+
+        if number == 1:
+            self.playerPlayed1.connect(worker.processMove)
+            self.requestMove1.connect(worker.getMove)
+        else:
+            self.playerPlayed2.connect(worker.processMove)
+            self.requestMove2.connect(worker.getMove)
 
     def reset(self):
         self.cursorCell = None
@@ -125,15 +145,39 @@ class BoardWidget(InterfaceView):
         super(BoardWidget, self).mouseReleaseEvent(event)
         if self.enableInput and event.button() == Qt.MouseButton.LeftButton:
             if self.board.positionEmpty(*self.cursorCell):
-                self.board.playPiece(*self.cursorCell)
-                self.processWin()
-            self.update()
+                self.playPiece(*self.cursorCell)
+
+    @Slot(int, int)
+    def playPiece(self, x, y):
+        self.board.playPiece(x, y)
+        self.update()
+
+        currentPlayer = self.board.getCurrentPlayer()
+        if currentPlayer == 1:
+            self.playerPlayed1.emit(x, y)
+        elif currentPlayer == 2:
+            self.playerPlayed2.emit(x, y)
+
+        self.processWin()
+        if self.gameEnd:
+            return
+        if currentPlayer == 1:
+            self.requestMove1.emit()
+        elif currentPlayer == 2:
+            self.requestMove2.emit()
+
+        if self.workers[currentPlayer] is not None:
+            self.enableInput = False
+        else:
+            self.enableInput = True
 
     def processWin(self):
         win = self.board.checkWinPiece()
         if win == 0:
             # No result
             return
+        self.gameEnd = True
+        self.enableInput = False
 
         # Create message box
         box = QMessageBox()
@@ -147,8 +191,5 @@ class BoardWidget(InterfaceView):
         elif win == -1:
             box.setText("The game is a tie!")
 
-        # Disable further input
-        self.enableInput = False
         # Show box
         box.exec()
-
