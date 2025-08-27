@@ -158,3 +158,30 @@ class MCTSNode:
             self.state.makeMove(move)
             node = MCTSNode(self.state)
         return node
+
+def mcts(root, iterations):
+    for i in range(iterations):
+        node = root
+        state = node.state.clone()
+
+        # Selection
+        while not node.untriedMoves and node.children:
+            node = node.uctSelectChild()
+            state.makeMove(node.move)
+
+        # Expansion
+        if node.untriedMoves:
+            move = state.explore(node.untriedMoves)
+            node = node.addChild(move, state)
+
+        # Simulation
+        while not state.isTerminal():
+            state.explore()
+
+        # Backpropagation
+        result = state.overallWinner
+        while node is not None:
+            node.update(result)
+            node = node.parent
+
+    return max(root.children.values(), key=lambda c: c.visits).move
