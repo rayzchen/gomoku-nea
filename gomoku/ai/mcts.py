@@ -1,3 +1,4 @@
+import math
 import random
 
 # Get positions based on board size
@@ -113,3 +114,47 @@ class GomokuState:
         move = random.choice(validMoves)
         self.makeMove(move)
         return move
+
+class MCTSNode:
+    __slots__ = ["state", "parent", "move", "children", "untriedMoves", "visits", "wins", "lastPlayer"]
+
+    def __init__(self, state, parent=None, move=None):
+        self.state = state
+        self.parent = parent
+        self.move = move
+        self.children = {}
+        self.untriedMoves = state.legalMoves
+        self.visits = 0
+        self.wins = 0
+        self.lastPlayer = 1 if state.currentPlayer == 2 else 2
+
+    def uctSelectChild(self, exploration=math.sqrt(2)):
+        # Avoid log calculation for each child
+        logN = math.log(self.visits)
+        return max(
+            self.children.values(),
+            key=lambda c: (c.wins / c.visits) + exploration * math.sqrt(logN / c.visits)
+        )
+
+    def addChild(self, move, state):
+        child = MCTSNode(state.clone(), parent=self, move=move)
+        self.untriedMoves &= ~(1 << move)
+        self.children[move] = child
+        return child
+
+    def update(self, result):
+        self.visits += 1
+        if result == self.lastPlayer:
+            self.wins += 1
+
+    def getNextNode(self, move):
+        # Returns the root of a new tree
+        # This node cannot be used anymore and should
+        # be garbage collected
+        if move in self.children:
+            node = self.children[move]
+            node.parent = None
+        else:
+            self.state.makeMove(move)
+            node = MCTSNode(self.state)
+        return node
