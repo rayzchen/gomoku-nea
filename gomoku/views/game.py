@@ -185,3 +185,25 @@ class BoardWidget(InterfaceView):
 
         # Show box
         box.exec()
+
+class WorkerBase(QObject):
+    finished = Signal(int, int)
+
+    def __init__(self):
+        super(WorkerBase, self).__init__()
+        self.workerThread = QThread()
+        QApplication.instance().aboutToQuit.connect(self.cleanup)
+        self.moveToThread(self.workerThread)
+        self.workerThread.start()
+
+    def cleanup(self):
+        self.workerThread.terminate()
+        self.workerThread.wait()
+
+    @Slot(int, int)
+    def processMove(self, x, y):
+        pass
+
+    @Slot()
+    def getMove(self):
+        pass
