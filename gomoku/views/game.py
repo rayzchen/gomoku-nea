@@ -2,7 +2,7 @@
 from gomoku.colors import *
 from gomoku.views.abc import InterfaceView
 # Module imports
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QMessageBox, QApplication
 from PySide6.QtGui import QPainter, Qt, QBrush, QColor
 from PySide6.QtCore import QPoint, QObject, Signal, Slot, QThread, QTimer
 import math
@@ -193,3 +193,25 @@ class BoardWidget(InterfaceView):
 
         # Show box
         box.exec()
+
+class WorkerBase(QObject):
+    finished = Signal(int, int)
+
+    def __init__(self):
+        super(WorkerBase, self).__init__()
+        self.workerThread = QThread()
+        QApplication.instance().aboutToQuit.connect(self.cleanup)
+        self.moveToThread(self.workerThread)
+        self.workerThread.start()
+
+    def cleanup(self):
+        self.workerThread.terminate()
+        self.workerThread.wait()
+
+    @Slot(int, int)
+    def processMove(self, x, y):
+        pass
+
+    @Slot()
+    def getMove(self):
+        pass
