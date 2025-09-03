@@ -1,6 +1,7 @@
 # Local imports
 from gomoku.colors import *
 from gomoku.views.abc import InterfaceView
+from gomoku.ai.mcts import GomokuState, MCTSNode, mcts
 # Module imports
 from PySide6.QtWidgets import QMessageBox, QApplication
 from PySide6.QtGui import QPainter, Qt, QBrush, QColor
@@ -215,3 +216,18 @@ class WorkerBase(QObject):
     @Slot()
     def getMove(self):
         pass
+
+class MCTSWorker(WorkerBase):
+    def __init__(self):
+        super(MCTSWorker, self).__init__()
+        self.node = MCTSNode(GomokuState())
+
+    @Slot(int, int)
+    def processMove(self, x, y):
+        self.node = self.node.getNextNode(15*y+x)
+
+    @Slot()
+    def getMove(self):
+        move = mcts(self.node, 2000)
+        self.node = self.node.getNextNode(move)
+        self.finished.emit(move % 15, move // 15)
