@@ -209,11 +209,9 @@ class WorkerBase(QObject):
         self.workerThread.terminate()
         self.workerThread.wait()
 
-    @Slot(int, int)
     def processMove(self, x, y):
         pass
 
-    @Slot()
     def getMove(self):
         pass
 
