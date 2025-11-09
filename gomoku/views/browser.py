@@ -24,6 +24,7 @@ class GameBrowser(InterfaceView):
         self.board = board
         self.boardWidget = BoardWidget(self.board)
         self.hlayout.addWidget(self.boardWidget, 0)
+        self.boardWidget.setFixedSize(600, 600)
 
         # Create sidebar
         self.sidebar = QWidget()
