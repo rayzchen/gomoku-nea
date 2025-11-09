@@ -2,22 +2,15 @@
 from gomoku.colors import *
 from gomoku.views.abc import InterfaceView
 # Module imports
-from PySide6.QtWidgets import QVBoxLayout, QLabel, QMessageBox
+from PySide6.QtWidgets import QMessageBox
 from PySide6.QtGui import QPainter, Qt, QBrush, QColor
 from PySide6.QtCore import QPoint
 import math
 
 class BoardWidget(InterfaceView):
     def __init__(self, board):
-        # Set up widget and layout
+        # Set up widget
         super(BoardWidget, self).__init__()
-        self.vlayout = QVBoxLayout()
-        self.setLayout(self.vlayout)
-        self.vlayout.setContentsMargins(0, 0, 0, 0)
-
-        self.label = QLabel()
-        self.vlayout.addWidget(self.label)
-        self.label.resize(600, 600)
 
         # Store reference to board state
         self.board = board
@@ -26,7 +19,6 @@ class BoardWidget(InterfaceView):
         # None if pointer is not in board
         self.cursorCell = None
         # Make sure this widget can access pointer location
-        self.label.setMouseTracking(True)
         self.setMouseTracking(True)
 
         # Toggle mouse input
@@ -42,6 +34,11 @@ class BoardWidget(InterfaceView):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         painter.setWindow(0, 0, 600, 600)
+
+        size = min(self.width(), self.height())
+        x = (self.width() - size) / 2
+        y = (self.height() - size) / 2
+        painter.setViewport(x, y, size, size)
 
         self.drawBoard(painter)
         if self.enableInput:
