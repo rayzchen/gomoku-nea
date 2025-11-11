@@ -3,11 +3,17 @@ from gomoku.colors import *
 from gomoku.views.abc import InterfaceView
 from gomoku.views.game import BoardWidget
 # Module imports
-from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QLabel, QFrame, QGridLayout, QPushButton, QListWidget, QSpacerItem, QSizePolicy
+from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QLabel, QFrame, QGridLayout, QPushButton, QListWidget, QSpacerItem, QSizePolicy, QListWidgetItem
 from PySide6.QtGui import QFont, Qt
 
 class GameBrowser(InterfaceView):
     def __init__(self, board):
+        # Attributes stored in sidebar
+        self.player1Name = "player1"
+        self.player2Name = "player2"
+        self.player1Rating = "N/A"
+        self.player2Rating = "N/A"
+
         # Constants for the fonts used in the sidebar
         TITLE_TIMER_FONT = QFont("Noto Sans JP", 16)
         USERNAME_FONT = QFont("Noto Sans JP", 14)
@@ -47,24 +53,24 @@ class GameBrowser(InterfaceView):
         self.playerFrame.setLayout(self.playergrid)
 
         # Add player info rows
-        self.player1 = QLabel("Black:\nplayer1 🡐")
+        self.player1 = QLabel()
         self.playergrid.addWidget(self.player1, 0, 0)
         self.player1.setFont(USERNAME_FONT)
-        self.player2 = QLabel("White:\nplayer2")
+        self.player2 = QLabel()
         self.playergrid.addWidget(self.player2, 0, 1)
         self.player2.setFont(USERNAME_FONT)
 
-        self.rating1 = QLabel("Rating: N/A")
+        self.rating1 = QLabel()
         self.playergrid.addWidget(self.rating1, 1, 0)
         self.rating1.setFont(RATING_FONT)
-        self.rating2 = QLabel("Rating: N/A")
+        self.rating2 = QLabel()
         self.playergrid.addWidget(self.rating2, 1, 1)
         self.rating2.setFont(RATING_FONT)
 
-        self.timer1 = QLabel("05:00")
+        self.timer1 = QLabel()
         self.playergrid.addWidget(self.timer1, 2, 0)
         self.timer1.setFont(TITLE_TIMER_FONT)
-        self.timer2 = QLabel("05:00")
+        self.timer2 = QLabel()
         self.playergrid.addWidget(self.timer2, 2, 1)
         self.timer2.setFont(TITLE_TIMER_FONT)
 
@@ -108,3 +114,25 @@ class GameBrowser(InterfaceView):
 
         # Make history stretch
         self.vlayout.setStretch(8, 1)
+
+        # Connect board widget signals to sidebar updating slots
+        self.boardWidget.playerPlayed1.connect(self.changePlayer)
+        self.boardWidget.playerPlayed2.connect(self.changePlayer)
+
+        # Set initial label text
+        self.updateLabels()
+
+    def updateLabels(self):
+        # Set username labels with current player marker
+        player1Text = f"Black:\n{self.player1Name}"
+        player2Text = f"White:\n{self.player2Name}"
+        if self.board.getCurrentPlayer() == 1:
+            player1Text += " 🡐"
+        else:
+            player2Text += " 🡐"
+        self.player1.setText(player1Text)
+        self.player2.setText(player2Text)
+
+        # Set rating labels
+        self.rating1.setText(f"Rating: {self.player1Rating}")
+        self.rating2.setText(f"Rating: {self.player2Rating}")
