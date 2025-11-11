@@ -5,7 +5,7 @@ from gomoku.views.game import BoardWidget
 # Module imports
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QLabel, QFrame, QGridLayout, QPushButton, QListWidget, QSpacerItem, QSizePolicy, QListWidgetItem
 from PySide6.QtGui import QFont, Qt
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, QTimer, QElapsedTimer
 
 class GameBrowser(InterfaceView):
     def __init__(self, board):
@@ -14,6 +14,18 @@ class GameBrowser(InterfaceView):
         self.player2Name = "player2"
         self.player1Rating = "N/A"
         self.player2Rating = "N/A"
+
+        # Timers for each player
+        self.playerTimer1 = 300
+        self.playerTimer2 = 300
+        self.elapsedTimer = QElapsedTimer()
+        self.elapsedTimer.start()
+
+        self.timerRunning = True
+        self.updateTimer = QTimer()
+        self.updateTimer.setInterval(100)
+        self.updateTimer.timeout.connect(self.updateTimerText)
+        self.updateTimer.start()
 
         # Constants for the fonts used in the sidebar
         TITLE_TIMER_FONT = QFont("Noto Sans JP", 16)
@@ -156,3 +168,25 @@ class GameBrowser(InterfaceView):
         self.history.addItem(item)
         self.history.scrollToBottom()
         self.history.clearSelection()
+
+        # Update player timers
+        if self.timerRunning:
+            if self.board.getCurrentPlayer() == 2:
+                self.playerTimer1 -= self.elapsedTimer.restart() / 1000
+            else:
+                self.playerTimer2 -= self.elapsedTimer.restart() / 1000
+
+    def updateTimerText(self):
+        if self.board.getCurrentPlayer() == 1:
+            time = self.playerTimer1 - self.elapsedTimer.elapsed() / 1000
+            self.timer1.setText(self.formatTimer(time))
+            self.timer2.setText(self.formatTimer(self.playerTimer2))
+        else:
+            time = self.playerTimer2 - self.elapsedTimer.elapsed() / 1000
+            self.timer1.setText(self.formatTimer(self.playerTimer1))
+            self.timer2.setText(self.formatTimer(time))
+
+    def formatTimer(self, seconds):
+        minutes = int(seconds // 60)
+        seconds = int(seconds % 60)
+        return f"{minutes:>02}:{seconds:>02}"
