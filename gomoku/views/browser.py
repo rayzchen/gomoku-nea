@@ -5,6 +5,7 @@ from gomoku.views.game import BoardWidget
 # Module imports
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QLabel, QFrame, QGridLayout, QPushButton, QListWidget, QSpacerItem, QSizePolicy, QListWidgetItem
 from PySide6.QtGui import QFont, Qt
+from PySide6.QtCore import Slot
 
 class GameBrowser(InterfaceView):
     def __init__(self, board):
@@ -136,3 +137,22 @@ class GameBrowser(InterfaceView):
         # Set rating labels
         self.rating1.setText(f"Rating: {self.player1Rating}")
         self.rating2.setText(f"Rating: {self.player2Rating}")
+
+    @Slot(int, int)
+    def changePlayer(self, x, y):
+        self.updateLabels()
+        if self.board.getCurrentPlayer() == 2:
+            # Black played piece
+            name = self.player1Name
+        else:
+            # White played piece
+            name = self.player2Name
+
+        # Convert (0, 0) into a1
+        pos = chr(x + 97) + str(y + 1)
+
+        # Add entry to move history
+        item = QListWidgetItem(f"{name} played {pos}")
+        self.history.addItem(item)
+        self.history.scrollToBottom()
+        self.history.clearSelection()
