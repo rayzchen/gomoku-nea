@@ -235,3 +235,6 @@ class Board:
 
         # No result, game has not ended
         return 0
+
+    def getCurrentPlayer(self):
+        return self.currentPlayer
