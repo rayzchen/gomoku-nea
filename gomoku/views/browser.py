@@ -1,5 +1,6 @@
 # Local imports
 from gomoku.colors import *
+from gomoku.board import Board
 from gomoku.views.abc import InterfaceView
 from gomoku.views.game import BoardWidget
 # Module imports
@@ -8,7 +9,7 @@ from PySide6.QtGui import QFont, Qt
 from PySide6.QtCore import Slot, QTimer, QElapsedTimer
 
 class GameBrowser(InterfaceView):
-    def __init__(self, board):
+    def __init__(self):
         # Attributes stored in sidebar
         self.player1Name = "player1"
         self.player2Name = "player2"
@@ -19,13 +20,11 @@ class GameBrowser(InterfaceView):
         self.playerTimer1 = 300
         self.playerTimer2 = 300
         self.elapsedTimer = QElapsedTimer()
-        self.elapsedTimer.start()
 
         self.timerRunning = True
         self.updateTimer = QTimer()
         self.updateTimer.setInterval(100)
         self.updateTimer.timeout.connect(self.updateTimerText)
-        self.updateTimer.start()
 
         # Constants for the fonts used in the sidebar
         TITLE_TIMER_FONT = QFont("Noto Sans JP", 16)
@@ -40,7 +39,7 @@ class GameBrowser(InterfaceView):
         self.hlayout.setContentsMargins(0, 0, 0, 0)
 
         # Add board widget to layout
-        self.board = board
+        self.board = Board()
         self.boardWidget = BoardWidget(self.board)
         self.hlayout.addWidget(self.boardWidget, 0)
         self.boardWidget.setFixedSize(600, 600)
@@ -197,3 +196,9 @@ class GameBrowser(InterfaceView):
         self.updateTimer.stop()
         self.elapsedTimer.restart()
         self.updateLabels()
+
+    def reset(self):
+        self.elapsedTimer.restart()
+        self.updateTimer.stop()
+        self.updateTimer.start()
+        self.boardWidget.requestMove1.emit()
