@@ -1,11 +1,12 @@
 # Local imports
 from gomoku.views.abc import InterfaceView
 # Module imports
-from PySide6.QtWidgets import QVBoxLayout, QSpacerItem, QLabel, QHBoxLayout, QPushButton, QSizePolicy
+from PySide6.QtWidgets import QVBoxLayout, QSpacerItem, QLabel, QHBoxLayout, QPushButton, QSizePolicy, QApplication
 from PySide6.QtGui import QFont, Qt
 
 class MainMenuView(InterfaceView):
     def __init__(self):
+        ...
         # Constants for the fonts used in the menu
         TITLE_FONT = QFont("Noto Sans JP", 60)
         BUTTON_FONT = QFont("Noto Sans JP", 16)
@@ -36,6 +37,10 @@ class MainMenuView(InterfaceView):
             button.setSizePolicy(
                 QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
             buttons.append(button)
+
+        # Connect buttons to navigate to views
+        buttons[0].pressed.connect(lambda: self.navigateTo("select"))
+        buttons[4].pressed.connect(QApplication.quit)
 
         # Create spacers
         for position in [0, 2, 4]:
