@@ -131,6 +131,7 @@ class GameBrowser(InterfaceView):
         # Connect board widget signals to sidebar updating slots
         self.boardWidget.playerPlayed1.connect(self.changePlayer)
         self.boardWidget.playerPlayed2.connect(self.changePlayer)
+        self.boardWidget.gameEnded.connect(self.stopTimers)
 
         # Set initial label text
         self.updateLabels()
@@ -190,3 +191,9 @@ class GameBrowser(InterfaceView):
         minutes = int(seconds // 60)
         seconds = int(seconds % 60)
         return f"{minutes:>02}:{seconds:>02}"
+
+    @Slot()
+    def stopTimers(self):
+        self.updateTimer.stop()
+        self.elapsedTimer.restart()
+        self.updateLabels()

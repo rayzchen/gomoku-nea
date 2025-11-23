@@ -13,6 +13,7 @@ class BoardWidget(InterfaceView):
     playerPlayed2 = Signal(int, int)
     requestMove1 = Signal()
     requestMove2 = Signal()
+    gameEnded = Signal()
 
     def __init__(self, board):
         # Set up widget
@@ -179,6 +180,7 @@ class BoardWidget(InterfaceView):
             return
         self.gameEnd = True
         self.enableInput = False
+        self.gameEnded.emit()
 
         # Create message box
         box = QMessageBox()
