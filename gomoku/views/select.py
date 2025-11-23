@@ -1,7 +1,7 @@
 # Local imports
 from gomoku.board import Board
 from gomoku.views.abc import InterfaceView
-from gomoku.views.game import BoardWidget
+from gomoku.views.game import BoardWidget, MCTSWorker
 # Module imports
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QLabel, QGridLayout, QComboBox, QCheckBox, QPushButton, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QFont, Qt
@@ -54,6 +54,12 @@ class GameSelection(InterfaceView):
         self.label4 = QLabel("Rated?")
         self.gridlayout.addWidget(self.label4, 3, 0)
         self.label4.setFont(TEXT_FONT)
+        self.label5 = QLabel("Player 1 AI")
+        self.gridlayout.addWidget(self.label5, 4, 0)
+        self.label5.setFont(TEXT_FONT)
+        self.label6 = QLabel("Player 2 AI")
+        self.gridlayout.addWidget(self.label6, 5, 0)
+        self.label6.setFont(TEXT_FONT)
 
         self.combo1 = QComboBox()
         self.gridlayout.addWidget(self.combo1, 0, 1)
@@ -82,8 +88,12 @@ class GameSelection(InterfaceView):
             self.combo3.addItem(choice)
         self.combo1.setCurrentText("None")
 
-        self.checkbox = QCheckBox()
-        self.gridlayout.addWidget(self.checkbox, 3, 1)
+        self.checkbox1 = QCheckBox()
+        self.gridlayout.addWidget(self.checkbox1, 3, 1)
+        self.checkbox2 = QCheckBox()
+        self.gridlayout.addWidget(self.checkbox2, 4, 1)
+        self.checkbox3 = QCheckBox()
+        self.gridlayout.addWidget(self.checkbox3, 5, 1)
 
         # Add start button
         self.buttonlayout = QHBoxLayout()
@@ -120,6 +130,12 @@ class GameSelection(InterfaceView):
         view = self.getView("game")
         view.playerTimer1 = self.combo1.currentData()
         view.playerTimer2 = self.combo1.currentData()
+
+        # Add AI player workers when necessary
+        if self.checkbox2.isChecked():
+            view.boardWidget.assignWorker(MCTSWorker(), 1)
+        if self.checkbox3.isChecked():
+            view.boardWidget.assignWorker(MCTSWorker(), 2)
 
         # Change the current view
         self.navigateTo("game")
