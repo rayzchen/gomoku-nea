@@ -1,5 +1,7 @@
 # Local imports
 from gomoku.views.menu import MainMenuView
+from gomoku.views.select import GameSelection
+from gomoku.views.browser import GameBrowser
 # Module imports
 from PySide6.QtWidgets import QMainWindow
 
@@ -13,6 +15,8 @@ class GomokuWindow(QMainWindow):
         # Lookup table of views
         self.views = {
             "menu": MainMenuView(),
+            "select": GameSelection(),
+            "game": GameBrowser(),
         }
         self.currentView = None
 
@@ -27,3 +31,11 @@ class GomokuWindow(QMainWindow):
         # Replace main view
         self.setCentralWidget(self.views[name])
         self.currentView = name
+
+    def getView(self, name):
+        # Check whether provided view exists
+        if name not in self.views:
+            raise Exception(f"Could not find view {name}")
+
+        # Return view with provided name
+        return self.views[name]

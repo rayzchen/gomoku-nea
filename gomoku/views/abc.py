@@ -11,3 +11,8 @@ class InterfaceView(QWidget):
         # Access current main window's methods
         window = QApplication.activeWindow()
         window.setView(viewName)
+
+    def getView(self, viewName):
+        # Access current main window's methods
+        window = QApplication.activeWindow()
+        return window.getView(viewName)
