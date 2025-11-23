@@ -6,6 +6,7 @@ from PySide6.QtGui import QFont, Qt
 
 class MainMenuView(InterfaceView):
     def __init__(self):
+        ...
         # Constants for the fonts used in the menu
         TITLE_FONT = QFont("Noto Sans JP", 60)
         BUTTON_FONT = QFont("Noto Sans JP", 16)
@@ -36,6 +37,9 @@ class MainMenuView(InterfaceView):
             button.setSizePolicy(
                 QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
             buttons.append(button)
+
+        # Connect buttons to navigate to views
+        buttons[0].pressed.connect(lambda: self.navigateTo("select"))
 
         # Create spacers
         for position in [0, 2, 4]:
